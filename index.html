@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mostafa KWD | Digital Designer & Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'var(--bg-color)',
+                        card: 'var(--card-bg)',
+                        subtle: 'var(--subtle-bg)',
+                        text: 'var(--text-main)',
+                        muted: 'var(--text-muted)',
+                        border: 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['IBM Plex Sans Arabic', 'sans-serif'], 
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'marquee': 'marquee 40s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        // Updated for seamless loop with JS cloning (move -50% of total width)
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Dark Theme (Default) */
+            --bg-color: #050505;
+            --card-bg: #0F0F0F;
+            --subtle-bg: #1a1a1a;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --nav-bg: rgba(5, 5, 5, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --noise-opacity: 0.03;
+            --blob-opacity: 0.15;
+            --marquee-grad: #050505;
+        }
+
+        [data-theme="light"] {
+            /* Light Theme */
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --subtle-bg: #f3f4f6;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --noise-opacity: 0.02;
+            --blob-opacity: 0.08;
+            --marquee-grad: #fafafa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        body[dir="rtl"] {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+
+        .bg-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: var(--noise-opacity);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        .glass-nav {
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to bottom right, var(--text-main) 30%, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bento-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+        
+        .bento-card:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1);
+        }
+
+        .glow-blob {
+            position: absolute;
+            background: radial-gradient(circle, rgba(59, 130, 246, var(--blob-opacity)) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bento-card:hover img { transform: scale(1.05); }
+        .bento-card img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .cta-button { position: relative; overflow: hidden; }
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .cta-button:hover::after { left: 100%; }
+
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--text-main);
+            transition: width 0.3s ease;
+        }
+        body[dir="rtl"] .nav-link::after { left: auto; right: 0; }
+        .nav-link:hover::after { width: 100%; }
+
+        .marquee-overlay-left {
+            background: linear-gradient(to right, var(--bg-color), transparent);
+        }
+        .marquee-overlay-right {
+            background: linear-gradient(to left, var(--bg-color), transparent);
+        }
+        
+        /* Logo Loop Images - Logic Updated for Visibility */
+        .logo-img {
+            height: 40px;
+            width: auto;
+            opacity: 0.6;
+            transition: all 0.3s;
+            filter: grayscale(100%) brightness(1.2); 
+        }
+        
+        [data-theme="light"] .logo-img {
+            filter: grayscale(100%) invert(1);
+        }
+
+        .logo-img:hover {
+            opacity: 1;
+            filter: grayscale(0%) brightness(1);
+        }
+
+        [data-theme="light"] .logo-img:hover {
+             filter: grayscale(0%) invert(1);
+        }
+
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <div class="bg-noise"></div>
+    <div class="glow-blob w-[500px] h-[500px] top-[-100px] left-1/2 transform -translate-x-1/2 animate-pulse-slow"></div>
+    <div class="glow-blob w-[600px] h-[600px] bottom-0 right-[-200px] bg-purple-900/10"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-3 items-center">
+            
+            <!-- Left: Logo Placeholder -->
+            <div class="flex justify-start">
+                <a href="#" class="block w-12 h-12 rounded-full overflow-hidden border border-border bg-subtle hover:opacity-80 transition-opacity relative group">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" alt="Profile" class="w-full h-full object-cover">
+                </a>
+            </div>
+
+            <!-- Center: Menu (Desktop) -->
+            <div class="hidden md:flex justify-center items-center gap-8 text-sm font-medium text-muted">
+                <a href="#work" class="nav-link hover:text-text transition-colors" data-i18n="nav_work">Work</a>
+                <a href="#about" class="nav-link hover:text-text transition-colors" data-i18n="nav_about">About</a>
+                <a href="#testimonials" class="nav-link hover:text-text transition-colors" data-i18n="nav_testimonials">Testimonials</a>
+            </div>
+            
+            <!-- Right: Controls & Mobile Toggle -->
+            <div class="flex justify-end items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleTheme()" class="w-9 h-9 flex items-center justify-center rounded-full border border-border text-muted hover:text-text hover:bg-subtle transition-all" aria-label="Toggle Theme">
+                        <i class="fas fa-sun hidden dark-icon"></i>
+                        <i class="fas fa-moon light-icon"></i>
+                    </button>
+                    <button onclick="toggleLang()" class="w-9 h-9 flex items-center justify-center rounded-full border border-border text-muted hover:text-text hover:bg-subtle transition-all text-xs font-bold" id="lang-btn">
+                        AR
+                    </button>
+                </div>
+
+                <button class="md:hidden text-text z-50 relative group w-9 h-9 flex items-center justify-center" onclick="toggleMobileMenu()">
+                    <div class="space-y-1.5 w-6">
+                        <span class="block w-full h-0.5 bg-text transition-transform duration-300 origin-center" id="hamburger-top"></span>
+                        <span class="block w-full h-0.5 bg-text transition-opacity duration-300" id="hamburger-middle"></span>
+                        <span class="block w-full h-0.5 bg-text transition-transform duration-300 origin-center" id="hamburger-bottom"></span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-background/95 backdrop-blur-xl z-40 transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col justify-center items-center gap-10 md:hidden">
+        <a href="#work" onclick="toggleMobileMenu()" class="text-3xl font-light tracking-tight text-text hover:text-muted transition-colors" data-i18n="nav_work">Work</a>
+        <a href="#about" onclick="toggleMobileMenu()" class="text-3xl font-light tracking-tight text-text hover:text-muted transition-colors" data-i18n="nav_about">About</a>
+        <a href="#testimonials" onclick="toggleMobileMenu()" class="text-3xl font-light tracking-tight text-text hover:text-muted transition-colors" data-i18n="nav_testimonials">Testimonials</a>
+        <a href="#contact" onclick="toggleMobileMenu()" class="text-3xl font-light tracking-tight text-text hover:text-muted transition-colors" data-i18n="nav_contact">Contact</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative pt-48 pb-32 px-6 min-h-screen flex flex-col justify-center items-center text-center overflow-hidden">
+        
+        <div class="animate-slide-up opacity-0 inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-subtle border border-border text-xs font-medium text-muted mb-10 backdrop-blur-md cursor-default">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span data-i18n="status_avail">Get in touch to collaborate</span>
+        </div>
+
+        <!-- Adjusted leading (line-height) to prevent Arabic text cut-off -->
+        <h1 class="animate-slide-up opacity-0 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-8 gradient-text leading-tight md:leading-tight" style="animation-delay: 0.1s;" data-i18n="hero_title">
+            Great ideas<br>start with creativity.
+        </h1>
+        
+        <p class="animate-slide-up opacity-0 max-w-2xl text-lg md:text-xl text-muted mb-10 leading-relaxed font-light" style="animation-delay: 0.2s;" data-i18n="hero_desc">
+            Hi, I am Mostafa. A creative designer passionate about turning ideas into distinctive visual reality. I believe every idea has the power to make a difference, and I am here to help you achieve that.
+        </p>
+        
+        <div class="animate-slide-up opacity-0 flex flex-col sm:flex-row gap-5 w-full sm:w-auto" style="animation-delay: 0.3s;">
+            <a href="#work" class="px-8 py-4 bg-text text-background rounded-full font-semibold hover:opacity-80 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2">
+                <span data-i18n="btn_projects">View Projects</span> 
+                <i class="fas fa-arrow-down text-xs transform -rotate-45 group-hover:rotate-0 transition-transform rtl:rotate-45"></i>
+            </a>
+            <a href="#contact" class="px-8 py-4 bg-subtle text-text border border-border rounded-full font-semibold hover:bg-card transition-all active:scale-95 flex items-center justify-center">
+                <span data-i18n="btn_contact">Get in Touch</span>
+            </a>
+        </div>
+
+    </section>
+
+    <!-- Work Section -->
+    <section id="work" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+            <div class="text-start">
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-3 text-text" data-i18n="work_title">Selected Work</h2>
+                <p class="text-muted text-lg" data-i18n="work_subtitle">A small gallery of recent projects.</p>
+            </div>
+            <a href="#" class="group hidden md:inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-text transition-colors">
+                <span data-i18n="work_view_all">View All Projects</span> 
+                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform rtl:rotate-180 rtl:group-hover:-translate-x-1"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[450px]">
+            <!-- Project 1 -->
+            <div class="bento-card rounded-[2rem] lg:col-span-2 relative group cursor-pointer">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                
+                <div class="absolute bottom-0 start-0 p-8 z-20 w-full transform transition-transform duration-500 group-hover:translate-y-[-10px] text-start">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="bg-white/10 backdrop-blur-md border border-white/10 text-white text-xs font-medium px-3 py-1 rounded-full">E-Commerce</div>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2">Lumina Fashion</h3>
+                    <p class="text-gray-300 text-sm max-w-lg" data-i18n="proj_1_desc">A high-performance headless Shopify storefront featuring 3D product configuration.</p>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="bento-card rounded-[2rem] relative group cursor-pointer">
+                <div class="absolute inset-0 z-0 bg-subtle">
+                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                
+                <div class="absolute bottom-0 start-0 p-8 z-20 w-full transform transition-transform duration-500 group-hover:translate-y-[-10px] text-start">
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 text-white text-xs font-medium px-3 py-1 rounded-full w-fit mb-4">iOS App</div>
+                    <h3 class="text-2xl font-bold mb-2 text-white">TaskFlow</h3>
+                    <p class="text-gray-300 text-sm" data-i18n="proj_2_desc">Productivity reimagined for the modern creative professional.</p>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="bento-card rounded-[2rem] relative group cursor-pointer">
+                <div class="absolute inset-0 z-0 bg-subtle">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity duration-500">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
+                
+                <div class="absolute bottom-0 start-0 p-8 z-20 w-full transform transition-transform duration-500 group-hover:translate-y-[-10px] text-start">
+                    <div class="bg-white/10 backdrop-blur-md border border-white/10 text-white text-xs font-medium px-3 py-1 rounded-full w-fit mb-4">SaaS Dashboard</div>
+                    <h3 class="text-2xl font-bold mb-2 text-white">Analytix Pro</h3>
+                    <p class="text-gray-300 text-sm" data-i18n="proj_3_desc">Real-time financial data visualization platform.</p>
+                </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="bento-card rounded-[2rem] lg:col-span-2 relative group cursor-pointer">
+                <div class="absolute inset-0 z-0 bg-subtle">
+                    <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500">
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
+                
+                <div class="absolute bottom-0 start-0 p-8 z-20 w-full transform transition-transform duration-500 group-hover:translate-y-[-10px] text-start">
+                    <div class="flex items-center justify-between mb-2">
+                         <div class="bg-white/10 backdrop-blur-md border border-white/10 text-white text-xs font-medium px-3 py-1 rounded-full">Photography</div>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-2 text-white">Lens & Light</h3>
+                    <p class="text-gray-300 text-sm max-w-lg" data-i18n="proj_4_desc">Minimalist portfolio for an award-winning architectural photographer.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee (Worked With - Single Set) -->
+    <section id="stack" class="py-24 border-y border-border overflow-hidden bg-background">
+        <h3 class="text-center text-muted text-sm tracking-widest uppercase mb-12" data-i18n="stack_title">Worked With</h3>
+        <div class="relative w-full group">
+            <div class="absolute top-0 left-0 w-32 h-full marquee-overlay-left z-10 pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-32 h-full marquee-overlay-right z-10 pointer-events-none"></div>
+            
+            <div class="flex gap-20 w-max animate-marquee items-center" dir="ltr" id="marquee-content">
+                <!-- Single Set of Logos (JavaScript will clone this) -->
+                <img src="https://placehold.co/120x40/transparent/white?text=Google" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Microsoft" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Spotify" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Amazon" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Netflix" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Adobe" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Figma" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Shopify" class="logo-img" alt="Logo">
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-6 max-w-5xl mx-auto">
+        <div class="bento-card rounded-[2.5rem] p-10 md:p-16 relative overflow-hidden">
+            <div class="absolute top-[-50px] right-[-50px] w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row gap-12 items-start">
+                <div class="flex-1 text-start">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-8 tracking-tight text-text" data-i18n="about_title">About Me</h2>
+                    <div class="space-y-6 text-muted text-lg leading-relaxed font-light">
+                        <p data-i18n="about_p1">
+                            I'm a multidisciplinary developer with a passion for design. I started my journey 5 years ago, tinkering with HTML & CSS to customize themes, and I've been hooked on the web ever since.
+                        </p>
+                        <p data-i18n="about_p2">
+                            Currently, I'm focused on building accessible, human-centered products. When I'm not coding, you can find me exploring new coffee shops, playing video games, or experimenting with 3D modeling.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 w-full md:w-auto md:min-w-[300px]">
+                    <div class="p-6 bg-subtle rounded-2xl border border-border hover:border-text/20 transition-colors">
+                        <div class="text-3xl font-bold text-text mb-1">5+</div>
+                        <div class="text-xs text-muted uppercase tracking-widest" data-i18n="stat_exp">Years Exp.</div>
+                    </div>
+                    <div class="p-6 bg-subtle rounded-2xl border border-border hover:border-text/20 transition-colors">
+                        <div class="text-3xl font-bold text-text mb-1">40+</div>
+                        <div class="text-xs text-muted uppercase tracking-widest" data-i18n="stat_proj">Projects</div>
+                    </div>
+                    <div class="p-6 bg-subtle rounded-2xl border border-border hover:border-text/20 transition-colors">
+                        <div class="text-3xl font-bold text-text mb-1">12</div>
+                        <div class="text-xs text-muted uppercase tracking-widest" data-i18n="stat_awards">Awards</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-text" data-i18n="test_title">What Clients Say</h2>
+            <p class="text-muted text-lg max-w-2xl mx-auto" data-i18n="test_subtitle">Feedback from people I've worked with.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="p-8 rounded-[2rem] bg-card border border-border hover:border-text/20 transition-colors relative bento-card">
+                <i class="fas fa-quote-left text-4xl text-subtle absolute top-8 left-8 opacity-50"></i>
+                <p class="text-text/80 leading-relaxed mb-6 mt-8 relative z-10" data-i18n="test_1_text">
+                    "Mostafa is a true professional. He transformed our vague ideas into a stunning digital product that exceeded our expectations. His attention to detail is unmatched."
+                </p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-subtle overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" alt="User" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-text text-sm" data-i18n="test_1_name">James Carter</h4>
+                        <span class="text-xs text-muted uppercase tracking-wider" data-i18n="test_1_role">CEO, TechStart</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="p-8 rounded-[2rem] bg-card border border-border hover:border-text/20 transition-colors relative bento-card">
+                 <i class="fas fa-quote-left text-4xl text-subtle absolute top-8 left-8 opacity-50"></i>
+                <p class="text-text/80 leading-relaxed mb-6 mt-8 relative z-10" data-i18n="test_2_text">
+                    "The best developer I've worked with. Fast, communicative, and has a great eye for design. The Arabic localization implementation was flawless."
+                </p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-subtle overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" alt="User" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-text text-sm" data-i18n="test_2_name">Sarah Ahmed</h4>
+                        <span class="text-xs text-muted uppercase tracking-wider" data-i18n="test_2_role">Product Manager</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="p-8 rounded-[2rem] bg-card border border-border hover:border-text/20 transition-colors relative bento-card">
+                 <i class="fas fa-quote-left text-4xl text-subtle absolute top-8 left-8 opacity-50"></i>
+                <p class="text-text/80 leading-relaxed mb-6 mt-8 relative z-10" data-i18n="test_3_text">
+                    "Incredible creativity and technical skill. Mostafa didn't just build a website, he built an experience. Highly recommended for any creative project."
+                </p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-subtle overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" alt="User" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-text text-sm" data-i18n="test_3_name">David Chen</h4>
+                        <span class="text-xs text-muted uppercase tracking-wider" data-i18n="test_3_role">Art Director</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-6 text-center relative overflow-hidden">
+        <div class="max-w-3xl mx-auto relative z-10">
+            <h2 class="text-5xl md:text-7xl font-bold mb-8 tracking-tighter text-text" data-i18n="contact_title">Let's work together.</h2>
+            <p class="text-xl text-muted mb-12 font-light" data-i18n="contact_desc">Have a project in mind? I'd love to help you bring your ideas to life.</p>
+            
+            <a href="mailto:hello@mostafakwd" class="group inline-flex items-center gap-3 px-10 py-5 bg-text text-background rounded-full font-bold text-lg hover:opacity-90 transition-all hover:scale-105 mb-16 shadow-lg">
+                <span data-i18n="btn_hello">Say Hello</span>
+                <i class="fas fa-arrow-right transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 rtl:rotate-180 rtl:group-hover:rotate-180"></i>
+            </a>
+
+            <div class="flex justify-center gap-8">
+                <a href="https://instagram.com/mostafakwd" target="_blank" class="text-muted hover:text-text transition-colors text-2xl"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com/in/mostafakwd" target="_blank" class="text-muted hover:text-text transition-colors text-2xl"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://behance.net/mostafakwd" target="_blank" class="text-muted hover:text-text transition-colors text-2xl"><i class="fab fa-behance"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-border bg-background">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p class="text-sm text-muted">&copy; 2024 Mostafa KWD. <span data-i18n="footer_rights">Crafted with precision.</span></p>
+            <div class="flex gap-6 text-sm text-muted font-medium">
+                <a href="#" class="hover:text-text transition-colors" data-i18n="footer_privacy">Privacy</a>
+                <a href="#" class="hover:text-text transition-colors" data-i18n="footer_terms">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Marquee Auto-Cloning ---
+        const marqueeContent = document.getElementById('marquee-content');
+        if (marqueeContent) {
+            const children = Array.from(marqueeContent.children);
+            children.forEach(child => {
+                const clone = child.cloneNode(true);
+                clone.setAttribute('aria-hidden', 'true');
+                marqueeContent.appendChild(clone);
+            });
+        }
+
+        // --- Translations ---
+        const translations = {
+            en: {
+                nav_work: "Work",
+                nav_about: "About",
+                nav_testimonials: "Testimonials",
+                nav_contact: "Let's Talk",
+                status_avail: "Get in touch to collaborate",
+                hero_title: "Great ideas<br>start with creativity.",
+                hero_desc: "Hi, I am Mostafa. A creative designer passionate about turning ideas into distinctive visual reality. I believe every idea has the power to make a difference, and I am here to help you achieve that.",
+                btn_projects: "View Projects",
+                btn_contact: "Get in Touch",
+                work_title: "Selected Work",
+                work_subtitle: "A small gallery of recent projects.",
+                work_view_all: "View All Projects",
+                proj_1_desc: "A high-performance headless Shopify storefront featuring 3D product configuration.",
+                proj_2_desc: "Productivity reimagined for the modern creative professional.",
+                proj_3_desc: "Real-time financial data visualization platform.",
+                proj_4_desc: "Minimalist portfolio for an award-winning architectural photographer.",
+                stack_title: "Worked With",
+                about_title: "About Me",
+                about_p1: "I'm a multidisciplinary developer with a passion for design. I started my journey 5 years ago, tinkering with HTML & CSS to customize themes, and I've been hooked on the web ever since.",
+                about_p2: "Currently, I'm focused on building accessible, human-centered products. When I'm not coding, you can find me exploring new coffee shops, playing video games, or experimenting with 3D modeling.",
+                stat_exp: "Years Exp.",
+                stat_proj: "Projects",
+                stat_awards: "Awards",
+                test_title: "What Clients Say",
+                test_subtitle: "Feedback from people I've worked with.",
+                test_1_text: "Mostafa is a true professional. He transformed our vague ideas into a stunning digital product that exceeded our expectations. His attention to detail is unmatched.",
+                test_1_name: "James Carter",
+                test_1_role: "CEO, TechStart",
+                test_2_text: "The best developer I've worked with. Fast, communicative, and has a great eye for design. The Arabic localization implementation was flawless.",
+                test_2_name: "Sarah Ahmed",
+                test_2_role: "Product Manager",
+                test_3_text: "Incredible creativity and technical skill. Mostafa didn't just build a website, he built an experience. Highly recommended for any creative project.",
+                test_3_name: "David Chen",
+                test_3_role: "Art Director",
+                contact_title: "Let's work together.",
+                contact_desc: "Have a project in mind? I'd love to help you bring your ideas to life.",
+                btn_hello: "Say Hello",
+                footer_rights: "Crafted with precision.",
+                footer_privacy: "Privacy",
+                footer_terms: "Terms"
+            },
+            ar: {
+                nav_work: "أعمالي",
+                nav_about: "من أنا",
+                nav_testimonials: "الآراء",
+                nav_contact: "تواصل معي",
+                status_avail: "تواصل معي للتعاون",
+                hero_title: "الأفكار العظيمة<br>تبدأ بالإبداع.",
+                hero_desc: "مرحباً، أنا مصطفى. مصمم ومبدع شغوف بتحويل الأفكار إلى واقع بصري مميز. أؤمن أن كل فكرة لديها القدرة على أن تُحدث فرقاً، وأنا هنا لأساعدك في تحقيق ذلك.",
+                btn_projects: "عرض المشاريع",
+                btn_contact: "تواصل معي",
+                work_title: "أعمال مختارة",
+                work_subtitle: "معرض صغير لأحدث مشاريعي.",
+                work_view_all: "عرض كل المشاريع",
+                proj_1_desc: "متجر شوبيفاي عالي الأداء يتميز بتكوين منتجات ثلاثية الأبعاد.",
+                proj_2_desc: "إعادة تصور للإنتاجية للمحترفين المبدعين.",
+                proj_3_desc: "منصة لتصور البيانات المالية في الوقت الفعلي.",
+                proj_4_desc: "محفظة بسيطة لمصور معماري حائز على جوائز.",
+                stack_title: "عملت مع",
+                about_title: "عني",
+                about_p1: "أنا مطور متعدد التخصصات شغوف بالتصميم. بدأت رحلتي قبل 5 سنوات، بتعديل HTML و CSS لتخصيص القوالب، ومنذ ذلك الحين وأنا متعلق بالويب.",
+                about_p2: "حالياً، أركز على بناء منتجات سهلة الاستخدام ومحورها الإنسان. عندما لا أكون مبرمجاً، تجدني أستكشف مقاهي جديدة، ألعب ألعاب الفيديو، أو أجرب النمذجة ثلاثية الأبعاد.",
+                stat_exp: "سنوات خبرة",
+                stat_proj: "مشاريع",
+                stat_awards: "جوائز",
+                test_title: "آراء العملاء",
+                test_subtitle: "ماذا يقول الناس عن العمل معي.",
+                test_1_text: "مصطفى محترف حقيقي. لقد حول أفكارنا المبهمة إلى منتج رقمي مذهل تجاوز توقعاتنا.",
+                test_1_name: "جيمس كارتر",
+                test_1_role: "الرئيس التنفيذي، تيك ستارت",
+                test_2_text: "أفضل مطور عملت معه. سريع ومتواصل جيداً ولديه نظرة رائعة للتصميم. كان تنفيذ التعريب مثالياً.",
+                test_2_name: "سارة أحمد",
+                test_2_role: "مديرة المنتج",
+                test_3_text: "إبداع ومهارة تقنية مذهلة. مصطفى لم يبنِ مجرد موقع ويب، بل بنى تجربة كاملة.",
+                test_3_name: "ديفيد تشين",
+                test_3_role: "مدير فني",
+                contact_title: "لنعمل معاً.",
+                contact_desc: "هل لديك مشروع في ذهنك؟ أحب أن أساعدك في تحويل أفكارك إلى واقع.",
+                btn_hello: "قل مرحباً",
+                footer_rights: "صُنع بإتقان.",
+                footer_privacy: "الخصوصية",
+                footer_terms: "الشروط"
+            }
+        };
+
+        // --- Logic ---
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+
+        // Initialize
+        document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+        document.documentElement.setAttribute('lang', currentLang);
+        if(currentTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        updateContent();
+        updateIcons();
+
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('lang', currentLang);
+            
+            document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.setAttribute('lang', currentLang);
+            
+            const btn = document.getElementById('lang-btn');
+            btn.textContent = currentLang === 'en' ? 'AR' : 'EN';
+            
+            updateContent();
+        }
+
+        function toggleTheme() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+            updateIcons();
+        }
+
+        function updateContent() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    // Use innerHTML for keys that might have <br> tags
+                    if(key === 'hero_title') {
+                        el.innerHTML = translations[currentLang][key];
+                    } else {
+                        el.textContent = translations[currentLang][key];
+                    }
+                }
+            });
+            document.getElementById('lang-btn').textContent = currentLang === 'en' ? 'AR' : 'EN';
+        }
+
+        function updateIcons() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const sun = document.querySelector('.light-icon');
+            const moon = document.querySelector('.dark-icon');
+            
+            if(isLight) {
+                sun.classList.add('hidden');
+                moon.classList.remove('hidden');
+            } else {
+                sun.classList.remove('hidden');
+                moon.classList.add('hidden');
+            }
+        }
+
+        // --- Existing UI Logic ---
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const hamburgerTop = document.getElementById('hamburger-top');
+            const hamburgerMiddle = document.getElementById('hamburger-middle');
+            const hamburgerBottom = document.getElementById('hamburger-bottom');
+            const body = document.body;
+
+            if (menu.classList.contains('translate-x-full')) {
+                menu.classList.remove('translate-x-full');
+                body.style.overflow = 'hidden';
+                hamburgerTop.classList.add('rotate-45', 'translate-y-2');
+                hamburgerMiddle.classList.add('opacity-0');
+                hamburgerBottom.classList.add('-rotate-45', '-translate-y-2');
+            } else {
+                menu.classList.add('translate-x-full');
+                body.style.overflow = '';
+                hamburgerTop.classList.remove('rotate-45', 'translate-y-2');
+                hamburgerMiddle.classList.remove('opacity-0');
+                hamburgerBottom.classList.remove('-rotate-45', '-translate-y-2');
+            }
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if(targetElement){
+                    // Only toggle mobile menu if it is currently open (not translated)
+                    const menu = document.getElementById('mobile-menu');
+                    if (!menu.classList.contains('translate-x-full')) {
+                        toggleMobileMenu(); 
+                    }
+                    
+                    setTimeout(() => targetElement.scrollIntoView({ behavior: 'smooth' }), 100);
+                }
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                    entry.target.classList.remove('opacity-0');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+        document.querySelectorAll('.bento-card, #about > div, section > h2, .animate-slide-up').forEach(el => {
+            if(!el.classList.contains('animate-slide-up')) {
+                 el.classList.add('opacity-0');
+                 observer.observe(el);
+            }
+        });
+    </script>
+</body>
+</html>
