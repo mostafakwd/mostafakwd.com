@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mostafa KWD | Digital Designer & Developer</title>
+    <title>Mostafa KWD | Brand Designer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,7 +37,6 @@
                             '0%': { opacity: '0', transform: 'translateY(40px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         },
-                        // Updated for seamless loop with JS cloning (move -50% of total width)
                         marquee: {
                             '0%': { transform: 'translateX(0%)' },
                             '100%': { transform: 'translateX(-50%)' },
@@ -271,7 +270,7 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="relative pt-48 pb-32 px-6 min-h-screen flex flex-col justify-center items-center text-center overflow-hidden">
+    <section class="relative pt-32 pb-20 px-6 min-h-screen flex flex-col justify-center items-center text-center overflow-hidden">
         
         <div class="animate-slide-up opacity-0 inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-subtle border border-border text-xs font-medium text-muted mb-10 backdrop-blur-md cursor-default">
             <span class="relative flex h-2 w-2">
@@ -281,8 +280,8 @@
             <span data-i18n="status_avail">Get in touch to collaborate</span>
         </div>
 
-        <!-- Adjusted leading (line-height) to prevent Arabic text cut-off -->
-        <h1 class="animate-slide-up opacity-0 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-8 gradient-text leading-tight md:leading-tight" style="animation-delay: 0.1s;" data-i18n="hero_title">
+        <!-- Adjusted leading (line-height) to prevent Arabic text cut-off, removed tracking-tighter -->
+        <h1 class="animate-slide-up opacity-0 text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-8 gradient-text leading-normal py-2" style="animation-delay: 0.1s;" data-i18n="hero_title">
             Great ideas<br>start with creativity.
         </h1>
         
@@ -387,6 +386,16 @@
             
             <div class="flex gap-20 w-max animate-marquee items-center" dir="ltr" id="marquee-content">
                 <!-- Single Set of Logos (JavaScript will clone this) -->
+                <img src="https://placehold.co/120x40/transparent/white?text=Google" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Microsoft" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Spotify" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Amazon" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Netflix" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Adobe" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Figma" class="logo-img" alt="Logo">
+                <img src="https://placehold.co/120x40/transparent/white?text=Shopify" class="logo-img" alt="Logo">
+                
+                <!-- Duplicate Set for Guaranteed Loop -->
                 <img src="https://placehold.co/120x40/transparent/white?text=Google" class="logo-img" alt="Logo">
                 <img src="https://placehold.co/120x40/transparent/white?text=Microsoft" class="logo-img" alt="Logo">
                 <img src="https://placehold.co/120x40/transparent/white?text=Spotify" class="logo-img" alt="Logo">
@@ -528,16 +537,9 @@
     </footer>
 
     <script>
-        // --- Marquee Auto-Cloning ---
+        // Removed JS cloning as it's now handled in HTML for robustness
         const marqueeContent = document.getElementById('marquee-content');
-        if (marqueeContent) {
-            const children = Array.from(marqueeContent.children);
-            children.forEach(child => {
-                const clone = child.cloneNode(true);
-                clone.setAttribute('aria-hidden', 'true');
-                marqueeContent.appendChild(clone);
-            });
-        }
+        // if (marqueeContent) { ... } // JS Cloning Removed
 
         // --- Translations ---
         const translations = {
